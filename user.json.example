@@ -1,6 +1,7 @@
 {
 	"self": {
 		"username": "test",
-		"token": "asdf"
+		"token": "asdf",
+		"ignores": ["repo"]
 	}
 }

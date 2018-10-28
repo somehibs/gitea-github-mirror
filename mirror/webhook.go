@@ -17,29 +17,29 @@ type Request struct {
 	Body string
 }
 
-type Webhook struct {
+type WebhookListener struct {
 	// Uses net/http
 	hooks []Hook
 }
 
-func NewWebhook() Webhook {
-	hook := Webhook{}
+func NewWebhookListener() WebhookListener {
+	hook := WebhookListener{}
 	http.Handle("/", hook)
 	return hook
 }
 
-func (w Webhook) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
+func (w WebhookListener) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 	// Got a message from gitea
 }
 
-func (w *Webhook) AddHook(hook Hook) {
+func (w *WebhookListener) AddHook(hook Hook) {
 	if w.HasHook(hook) {
 		return
 	}
 	w.hooks = append(w.hooks, hook)
 }
 
-func (w *Webhook) HasHook(hook Hook) bool {
+func (w *WebhookListener) HasHook(hook Hook) bool {
 	for _, hk := range w.hooks {
 		if hk == hook {
 			return true

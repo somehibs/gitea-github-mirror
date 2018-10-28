@@ -1,6 +1,8 @@
 package mirror
 
 import (
+	//"fmt"
+
 	"fmt"
 
 	"github.com/jinzhu/gorm"
@@ -8,6 +10,23 @@ import (
 )
 
 // Gitea SQLite types from DESCRIBE `table`
+type Webhook struct {
+	Id           int64
+	RepoId       int64
+	OrgId        int64
+	Url          string
+	ContentType  int64
+	Secret       string
+	Events       string
+	IsSsl        byte
+	IsActive     byte
+	HookTaskType int
+	Meta         string
+	LastStatus   int
+	CreatedUnix  int64
+	UpdatedUnix  int64
+}
+
 type User struct {
 	Id               int64
 	LowerName        string
@@ -74,7 +93,6 @@ func NewDatabase() Database {
 	conf := GetConfig()
 	var err error
 	connectStr := fmt.Sprintf("%s:%s@%s/%s?charset=utf8&parseTime=True", conf.DbUser, conf.DbPass, conf.DbUrl, conf.DbName)
-	fmt.Println(connectStr)
 	db.db, err = gorm.Open("mysql", connectStr)
 	db.db.SingularTable(true)
 	if err != nil {
@@ -83,11 +101,24 @@ func NewDatabase() Database {
 	return db
 }
 
-func (db *Database) HookUser(username string) {
-	// Fetch all of this user's owned repositories by first fetching the user.
+func (db *Database) User(username string) User {
 	var user User
 	db.db.First(&user, "name = ?", username)
-	fmt.Printf("Found user for hook: %+v\n", user)
-	//userRepos map[string]int
-	return
+	return user
+}
+
+func (db *Database) UserRepos(user User, private bool) []Repository {
+	repos := make([]Repository, 0)
+	db.db.Where("owner_id = ? AND is_private = ?", user.Id, private).Find(&repos)
+	return repos
+}
+
+func (db *Database) RepoHooks(repos []Repository) []Webhook {
+	hooks := make([]Webhook, 0)
+	repoIds := make([]int64, len(repos))
+	for _, repo := range repos {
+		repoIds = append(repoIds, repo.Id)
+	}
+	db.db.Where("repo_id in (?)", repoIds).Find(&hooks)
+	return hooks
 }

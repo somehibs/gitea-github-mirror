@@ -39,6 +39,7 @@ func GetConfig() Config {
 type RemoteUser struct {
 	Username string
 	Token    string
+	Ignores  []string
 }
 
 func GetUserConfig(cfg Config) map[string]RemoteUser {
