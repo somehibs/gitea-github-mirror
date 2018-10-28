@@ -11,7 +11,7 @@ type Hook interface {
 }
 
 type Request struct {
-	Url string
+	Url  string
 	Repo string
 	User string
 	Body string
@@ -33,7 +33,7 @@ func (w Webhook) ServeHTTP(writer http.ResponseWriter, request *http.Request) {
 }
 
 func (w *Webhook) AddHook(hook Hook) {
-	if (w.HasHook(hook)) {
+	if w.HasHook(hook) {
 		return
 	}
 	w.hooks = append(w.hooks, hook)

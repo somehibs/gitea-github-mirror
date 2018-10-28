@@ -10,11 +10,11 @@ import (
 )
 
 type Config struct {
-	DbUser string
-	DbPass string
-	DbUrl string
-	DbName string
-	Port int
+	DbUser     string
+	DbPass     string
+	DbUrl      string
+	DbName     string
+	Port       int
 	UserConfig string
 }
 
@@ -36,19 +36,19 @@ func GetConfig() Config {
 	return cfg
 }
 
-type User struct {
+type RemoteUser struct {
 	Username string
-	Token string
+	Token    string
 }
 
-func GetUserConfig(cfg Config) map[string]User {
+func GetUserConfig(cfg Config) map[string]RemoteUser {
 	f, err := os.Open(cfg.UserConfig)
 	if err != nil {
 		panic("Error opening user config: " + err.Error())
 	}
 	defer f.Close()
 	decode := json.NewDecoder(f)
-	userMap := map[string]User{}
+	userMap := map[string]RemoteUser{}
 	err = decode.Decode(&userMap)
 	if err != nil {
 		panic("Error reading user config: " + err.Error())

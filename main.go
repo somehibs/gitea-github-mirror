@@ -7,7 +7,6 @@ import (
 func main() {
 	cfg := mirror.GetConfig()
 	_ = mirror.GetUserConfig(cfg)
-	mirror.NewDatabase()
 	mirror.NewRepos()
 	mirror.ListenForever()
 }

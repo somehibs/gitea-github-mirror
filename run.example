@@ -1,0 +1,11 @@
+#!/bin/bash
+# default DB_USER is 'gitea'
+# default DB (database) is 'gitea'
+export DB_PASS=""
+# default db_url is mysql local socket
+#export DB_URL="tcp(example.com:3306)"
+# other engines (sqlite) could be supported by changing the provider and integration in monitor/db.go
+
+# run the thing
+go run main.go
+
