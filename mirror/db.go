@@ -4,6 +4,7 @@ import (
 	//"fmt"
 
 	"fmt"
+	"time"
 
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
@@ -99,6 +100,34 @@ func NewDatabase() Database {
 		panic("Cannot open DB: " + err.Error())
 	}
 	return db
+}
+
+func (db *Database) AddRepoHook(url string, secret string, pushOnly bool, ssl bool, meta string, repo Repository) {
+	hook := Webhook{}
+	hook.RepoId = repo.Id
+	hook.OrgId = repo.OwnerId
+	hook.Url = url
+	hook.ContentType = 1
+	hook.Secret = secret
+	event := ""
+	if pushOnly {
+		event = `{"push_only":true,"send_everything":false,"choose_events":false,"events":{"create":false,"delete":false,"fork":false,"issues":false,"issue_comment":false,"push":false,"pull_request":false,"repository":false,"release":false}}`
+	} else {
+		event = `{"push_only":false,"send_everything":true,"choose_events":false,"events":{"create":false,"delete":false,"fork":false,"issues":false,"issue_comment":false,"push":false,"pull_request":false,"repository":false,"release":false}}`
+	}
+	hook.Events = event
+	if ssl {
+		hook.IsSsl = 1
+	} else {
+		hook.IsSsl = 0
+	}
+	hook.IsActive = 1
+	hook.HookTaskType = 3
+	hook.LastStatus = 0
+	hook.CreatedUnix = time.Now().Unix()
+	hook.UpdatedUnix = time.Now().Unix()
+	hook.Meta = meta
+	db.db.Create(&hook)
 }
 
 func (db *Database) User(username string) User {
