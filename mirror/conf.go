@@ -33,7 +33,7 @@ func GetConfig() Config {
 	users := flag.String("user_conf", "user.json", "File containing mappings of gitea users to github credentials")
 	apiIp := flag.String("ip", "127.0.0.1", "Webhook IP (network accessable by Gitea/external)")
 	port := flag.Int("port", 9001, "Webhook port (defaults to 9001)")
-	path := flag.String("path", "", "Path to Gitea repositories")
+	path := flag.String("repo_path", "", "Path to Gitea repositories")
 	fmt.Println("Loading config...")
 	flag.Parse()
 	cfg = Config{*user, *pass, *url, *db, *apiIp, *port, *path, *users}

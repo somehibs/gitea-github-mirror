@@ -44,10 +44,10 @@ func (r Repos) Event(req GiteaEvent) {
 	// valid repo, mirror
 	// first, get the repo on disk
 	root := GetConfig().Path
-	path := fmt.Sprintf("%s/%s", root, req.Repository.Name)
+	path := fmt.Sprintf("%s/%s/%s", root, owner, req.Repository.Name)
 	path = path + ".git"
 	repo, err := git.PlainOpen(path)
-	fmt.Printf("Repo: %+v err %+v\n", repo, err)
+	fmt.Printf("Path: %s Repo: %+v err %+v\n", path, repo, err)
 	//for _, remote := range r.mirrorUsers[owner] {
 	//	remote
 	//}
