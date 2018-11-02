@@ -2,11 +2,12 @@
 # default DB_USER is 'gitea'
 # default DB (database) is 'gitea'
 export DB_PASS=""
+export REPO_PATH="/example/repositories"
+export BASE_URL="https://git.example.com/"
+export IP="127.0.0.1" # empty string, bind-all
 # default db_url is mysql local socket
 #export DB_URL="tcp(example.com:3306)"
-#export IP="127.0.0.1" # undefined, localhost. empty string, bind-all
 # other engines (sqlite) could be supported by changing the provider and integration in monitor/db.go
 
 # run the thing
 go run main.go
-

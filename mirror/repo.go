@@ -15,7 +15,7 @@ import (
 // - discovering when repositories need new webhooks (intermittent action)
 // - determining if there is a sink for a given webhook update
 
-type ServiceHandle func(user, pass, repo string) error
+type ServiceHandle func(user, pass, repo, desc string) error
 
 type Repos struct {
 	// Keep a copy of the user config
@@ -66,18 +66,21 @@ func (r Repos) AddRemote(repo *git.Repository, repoName string, service ServiceC
 	}
 }
 
-func (r Repos) PushRemote(repo *git.Repository, service ServiceConfig, user RemoteUser, remote, repoName string, retry bool) {
+func (r Repos) PushRemote(repo *git.Repository, service ServiceConfig, user RemoteUser, remote, repoName, localUser string, retry bool) {
 	err := repo.Push(&git.PushOptions{RemoteName: remote})
 	if err == transport.ErrRepositoryNotFound && retry == false {
 		if create, ok := r.createHandlers[user.Service]; ok {
 			fmt.Println("Attempting to create repository")
-			create(user.Username, user.Token, repoName)
-			r.PushRemote(repo, service, user, remote, repoName, true)
+			desc := fmt.Sprintf("Automatically mirrored from %s%s/%s", GetConfig().BaseUrl, localUser, repoName)
+			create(user.Username, user.Token, repoName, desc)
+			r.PushRemote(repo, service, user, remote, repoName, localUser, true)
 		} else {
 			fmt.Printf("Could not create repository for service type %s so repo %s is being ignored\n", user.Service, repoName)
 		}
 	} else if err != nil {
 		fmt.Printf("Push: Something went wrong (repo %s): %s\n", repoName, err.Error())
+	} else {
+		fmt.Printf("Pushed %s to %s OK\n", repoName, remote)
 	}
 }
 
@@ -91,7 +94,7 @@ func (r Repos) Event(req GiteaEvent) {
 			if remote, ok := r.repoConfig.RemoteUsers[remoteUser]; ok {
 				if service, ok := r.repoConfig.Services[remote.Service]; ok {
 					r.AddRemote(repo, req.Repository.Name, service, remote)
-					r.PushRemote(repo, service, remote, remoteUser, req.Repository.Name, false)
+					r.PushRemote(repo, service, remote, remoteUser, req.Repository.Name, owner, false)
 				}
 			} else {
 				fmt.Printf("Could not find config for remote %s\n", remoteUser)
