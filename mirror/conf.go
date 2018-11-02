@@ -17,7 +17,28 @@ type Config struct {
 	IP         string
 	Port       int
 	Path       string
-	UserConfig string
+	UserConfigFile string
+}
+
+type ServiceConfig struct {
+	Url string
+}
+
+type LocalUser struct {
+	Ignores []string
+	RemoteUsers []string `json:"remote_users"`
+}
+
+type RemoteUser struct {
+	Username string
+	Service	 string
+	Token    string
+}
+
+type UserConfig struct {
+	Users map[string]LocalUser
+	Services map[string]ServiceConfig
+	RemoteUsers map[string]RemoteUser `json:"remote_users"`
 }
 
 var cfg Config
@@ -40,23 +61,17 @@ func GetConfig() Config {
 	return cfg
 }
 
-type RemoteUser struct {
-	Username string
-	Token    string
-	Ignores  []string
-}
-
-func GetUserConfig(cfg Config) map[string][]RemoteUser {
-	f, err := os.Open(cfg.UserConfig)
+func GetUserConfig(cfg Config) UserConfig {
+	f, err := os.Open(cfg.UserConfigFile)
 	if err != nil {
 		panic("Error opening user config: " + err.Error())
 	}
 	defer f.Close()
 	decode := json.NewDecoder(f)
-	userMap := map[string][]RemoteUser{}
-	err = decode.Decode(&userMap)
+	ucfg := UserConfig{}
+	err = decode.Decode(&ucfg)
 	if err != nil {
 		panic("Error reading user config: " + err.Error())
 	}
-	return userMap
+	return ucfg
 }
